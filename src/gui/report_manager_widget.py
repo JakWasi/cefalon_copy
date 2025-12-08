@@ -11,6 +11,7 @@ import os
 os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox"
 from reporting.report_generator import generate_report
 
+
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 REPORTS_DIR = os.path.join(PROJECT_ROOT, "data", "flows", "processed", "reports")
 os.makedirs(REPORTS_DIR, exist_ok=True)
