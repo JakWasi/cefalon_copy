@@ -1,4 +1,3 @@
-# src/gui/widgets.py
 import os
 import sys
 import pandas as pd
@@ -28,17 +27,13 @@ class MplCanvas(FigureCanvas):
         self.ax.set_facecolor("#121212")
         super().__init__(fig)
 
-    def plot(self, x, y, metric, logy=False):
+    def plot(self, x, y, metric):
         self.ax.clear()
         self.ax.plot(x, y, color="#66ccff" if metric == "anomaly_score" else "#ffcc66")
 
-        # logarytmiczna skala Y dla anomaly_score
-        if logy:
-            self.ax.set_yscale("log")
-
-        # stałe zakresy dla pozostałych metryk
+        # stałe zakresy
         if metric == "anomaly_score":
-            self.ax.set_ylim(0.001, max(y) * 1.2 if len(y) else 0.5)
+            self.ax.set_ylim(0, 100)  # anomaly score w procentach – skala 0–100
         elif metric == "total_bytes":
             ymax = max(y) if len(y) else 0
             self.ax.set_ylim(0, ymax * 1.2 if ymax > 0 else 1000)
@@ -96,10 +91,16 @@ class LivePlotWidget(QWidget):
             df = pd.read_csv(self.csv_file)
             if df.empty or self.current_metric not in df.columns:
                 return
+
             y = df[self.current_metric].astype(float).tail(120).values
+
+            # anomaly_score skalujemy na % jak w tabeli
+            if self.current_metric == "anomaly_score":
+                y = y * 100
+
             x = list(range(len(y)))
-            logy = self.current_metric == "anomaly_score"
-            self.canvas.plot(x, y, self.current_metric, logy=logy)
+            self.canvas.plot(x, y, self.current_metric)
+
         except Exception:
             return
 
@@ -178,7 +179,6 @@ class FlowTableWidget(QWidget):
             self.table.setColumnCount(len(cols))
             self.table.setHorizontalHeaderLabels(cols)
 
-            # Wypełnianie tabeli stabilnie przy checkboxach
             for i, row in enumerate(df[cols].itertuples(index=False)):
                 for j, val in enumerate(row):
                     item = QTableWidgetItem(str(val))

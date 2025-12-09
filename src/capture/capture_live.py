@@ -32,7 +32,6 @@ except Exception:
 OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "flows", "processed", "live_flows.csv")
 FLOW_TIMEOUT = 10.0
 
-# Dodajemy 'timestamp' na pierwszym miejscu
 FEATURES = [
     "timestamp",
     "duration",
@@ -69,7 +68,8 @@ def detect_interface():
             if iface != "lo":
                 best_iface = iface
                 break
-    return best_iface or "eth0"
+    #return best_iface or "eth0"
+    return 'lo'
 
 def get_local_ips():
     local_ips = set()
