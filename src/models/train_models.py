@@ -9,10 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import MiniBatchKMeans
 from tqdm import tqdm
 
-
-# ============================================================
 # CONFIG
-# ============================================================
 
 PARQUET_FILE = "data/flows/processed/merged_dataset.parquet"
 MODELS_DIR = "models"
@@ -22,14 +19,10 @@ BATCH_SIZE = 200_000
 N_CLUSTERS = 30
 THRESHOLD_PERCENTILE = 98
 
-
-# ============================================================
 # UTILS
-# ============================================================
 
 def ensure_dir(path):
     os.makedirs(path, exist_ok=True)
-
 
 def load_batches(parquet_path, batch_size):
     table = pq.read_table(parquet_path)
@@ -38,28 +31,19 @@ def load_batches(parquet_path, batch_size):
     for start in range(0, len(df), batch_size):
         yield df.iloc[start:start + batch_size]
 
-
 def anomaly_score(X_scaled, kmeans):
     labels = kmeans.predict(X_scaled)
     centers = kmeans.cluster_centers_
     return np.linalg.norm(X_scaled - centers[labels], axis=1)
-
-
-# ============================================================
-# MAIN TRAINING PIPELINE
-# ============================================================
 
 def main():
 
     ensure_dir(MODELS_DIR)
     ensure_dir(PLOTS_DIR)
 
-    # =====================================================================
-    # 1️⃣ TRAIN SCALER
-    # =====================================================================
-    print("\n============================================")
+    # TRAIN SCALER
+    
     print("  TRAINING StandardScaler")
-    print("============================================\n")
 
     scaler = StandardScaler()
 
@@ -69,13 +53,9 @@ def main():
 
     print("Scaler trained.\n")
 
-    # =====================================================================
     # 2️⃣ TRAIN MiniBatchKMeans
-    # =====================================================================
 
-    print("\n============================================")
     print("  TRAINING MiniBatchKMeans")
-    print("============================================\n")
 
     kmeans = MiniBatchKMeans(
         n_clusters=N_CLUSTERS,
@@ -97,13 +77,9 @@ def main():
 
     print("KMeans trained.\n")
 
-    # =====================================================================
-    # 3️⃣ COMPUTE GLOBAL THRESHOLD
-    # =====================================================================
+    # COMPUTE GLOBAL THRESHOLD
 
-    print("\n============================================")
     print("  COMPUTING THRESHOLD")
-    print("============================================\n")
 
     all_scores = []
 
@@ -118,9 +94,7 @@ def main():
 
     print(f"Threshold computed: {threshold}\n")
 
-    # =====================================================================
-    # 4️⃣ SAVE MODELS
-    # =====================================================================
+    # SAVE MODELS
 
     joblib.dump(scaler, f"{MODELS_DIR}/scaler.pkl")
     joblib.dump(kmeans, f"{MODELS_DIR}/kmeans.pkl")
@@ -128,12 +102,9 @@ def main():
 
     print("Models saved.\n")
 
-    # =====================================================================
-    # 5️⃣ GENERATE PLOTS
-    # =====================================================================
-    print("\n============================================")
+    # GENERATE PLOTS
+
     print("  GENERATING PLOTS")
-    print("============================================\n")
 
     # Histogram anomaly scores
     plt.figure(figsize=(12, 6))
@@ -183,9 +154,7 @@ def main():
     print("All plots saved.")
     print(f"Plots directory: {PLOTS_DIR}\n")
 
-    print("============================================")
-    print(" TRAINING + PLOTS DONE 🎉")
-    print("============================================")
+    print(" TRAINING + PLOTS DONE ")
 
 
 if __name__ == "__main__":
