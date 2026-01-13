@@ -70,7 +70,6 @@ def main():
         X_scaled = scaler.transform(X)
         kmeans.partial_fit(X_scaled)
 
-        # optional: track how "strange" batches look
         dists = anomaly_score(X_scaled, kmeans)
         per = np.percentile(dists, THRESHOLD_PERCENTILE)
         batch_rejection_rates.append(per)
