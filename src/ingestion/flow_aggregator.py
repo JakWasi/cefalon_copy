@@ -84,9 +84,6 @@ class FlowAggregator:
             f.dst_bytes += int(size or 0)
 
     def extract_ready_flows(self) -> List[Flow]:
-        """
-        Return flows that are idle for >= timeout seconds and remove them from memory.
-        """
         now = time.time()
         ready = []
         for k, last in list(self._last_seen.items()):
@@ -97,9 +94,6 @@ class FlowAggregator:
         return ready
 
     def force_close_all(self) -> List[Flow]:
-        """
-        Force-close everything (used on shutdown).
-        """
         all_flows = list(self._flows.values())
         self._flows.clear()
         self._last_seen.clear()
