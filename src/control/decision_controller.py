@@ -32,11 +32,9 @@ class DecisionController:
         print(f"[DecisionController] block_ip: {ip}")
         self._blocked.add(ip)
         if ENABLE_ACTIVE_BLOCKING:
-            # Add an iptables rule to DROP traffic from ip (INPUT chain).
-            # NOTE: you need root to run these commands.
             cmd = ["sudo", "iptables", "-I", "INPUT", "-s", ip, "-j", "DROP"]
             if self.iface:
-                cmd[2:2] = ["-i", self.iface]  # insert interface option if provided
+                cmd[2:2] = ["-i", self.iface]
             self._run_cmd(cmd)
 
     def allow_ip(self, ip: str):
@@ -44,12 +42,9 @@ class DecisionController:
         if ip in self._blocked:
             self._blocked.remove(ip)
         if ENABLE_ACTIVE_BLOCKING:
-            # Try to remove any matching DROP rules (best-effort)
-            # This naive removal may need adaptation to your iptables rule ordering.
             cmd = ["sudo", "iptables", "-D", "INPUT", "-s", ip, "-j", "DROP"]
             if self.iface:
                 cmd[2:2] = ["-i", self.iface]
-            # run repeatedly until it fails to try removing duplicates
             while True:
                 try:
                     subprocess.run(cmd, check=True)
