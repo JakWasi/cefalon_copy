@@ -68,8 +68,7 @@ def detect_interface():
             if iface != "lo":
                 best_iface = iface
                 break
-    #return best_iface or "eth0"
-    return 'lo'
+    return best_iface or "eth0"
 
 def get_local_ips():
     local_ips = set()
